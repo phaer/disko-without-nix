@@ -9,7 +9,6 @@ pub struct ZfsPartition {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Zpool {
-    pub name: Option<String>,
     #[serde(rename="type")]
     pub type_: String,
     #[serde(default)]
