@@ -111,38 +111,7 @@ fn main() -> Result<()> {
 
     if let Some(zpools) = config.zpool {
         for (zpool_name, zpool_config) in zpools {
-            create_script.push_str(&format!(
-                "zpool create {} {} {} {} ${{ZFSDEVICES_{}}}\n",
-                zpool_name,
-                zpool_config.mode,
-                zfs::make_zfs_options(&zpool_config.options, "-o"),
-                zfs::make_zfs_options(&zpool_config.root_fs_options, "-O"),
-                zpool_name,
-            ));
-
-            for (dataset_name, dataset_config) in &zpool_config.datasets {
-                match dataset_config {
-                    zfs::ZfsDataset::Filesystem(filesystem) =>
-                        create_script.push_str(&format!(
-                            "zfs create {}/{} {}\n",
-                            zpool_name,
-                            dataset_name,
-                            zfs::make_zfs_options(&filesystem.options, "-o")
-                        )),
-                    zfs::ZfsDataset::Volume(volume) => {
-                        create_script.push_str(&format!(
-                            "zfs create {}/{} {} -V {}\n",
-                            zpool_name,
-                            dataset_name,
-                            zfs::make_zfs_options(&volume.options, "-o"),
-                            volume.size
-                        ));
-                        create_script.push_str("udevadm trigger --subsystem-match=block; udevadm settle\n");
-                        // TODO create volume contents
-                    },
-               }
-
-            }
+            create_script.push_str(&zpool_config.create(&zpool_name).join("\n"));
         }
     }
 
