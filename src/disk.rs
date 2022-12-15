@@ -2,23 +2,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Disk {
-    device: String,
+    pub device: String,
     #[serde(rename="type")]
-     type_: String,
-    content: DiskContent
+    pub type_: String,
+    pub content: DiskContent
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "type")]
 #[serde(rename_all = "lowercase")]
-enum DiskContent {
+pub enum DiskContent {
     Table(Table),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Table {
-    format: TableFormat,
-    partitions: Vec<crate::partition::Partition>
+    pub format: TableFormat,
+    pub partitions: Vec<crate::partition::Partition>
 }
 
 #[derive(Serialize, Deserialize, Debug)]

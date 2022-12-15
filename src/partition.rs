@@ -3,18 +3,18 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Partition {
     #[serde(rename="type")]
-    type_: String,
+    pub type_: String,
     #[serde(default)]
-    part_type: PartitionType,
-    fs_type: Option<FilesystemType>,
-    name: Option<String>,
-    start: String,
-    end: String,
+    pub part_type: PartitionType,
+    pub fs_type: Option<FilesystemType>,
+    pub name: Option<String>,
+    pub start: String,
+    pub end: String,
     #[serde(default)]
-    flags: Vec<String>,
+    pub flags: Vec<String>,
     #[serde(default)]
-    bootable: bool,
-    content: PartitionContent
+    pub bootable: bool,
+    pub content: PartitionContent
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -57,9 +57,9 @@ pub enum PartitionContent {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct FilesystemPartition {
-    format: String,
-    mountpoint: String,
-    options: Option<Vec<String>>,
-    mount_options: Option<Vec<String>>,
-    extra_args: Option<String>,
+    pub format: String,
+    pub mountpoint: String,
+    pub options: Option<Vec<String>>,
+    pub mount_options: Option<Vec<String>>,
+    pub extra_args: Option<String>,
 }
