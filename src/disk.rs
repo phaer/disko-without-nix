@@ -6,14 +6,16 @@ pub struct Disk {
     pub device: String,
     #[serde(rename="type")]
     pub type_: String,
-    pub content: DiskContent
+    pub content: Content
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "type")]
 #[serde(rename_all = "lowercase")]
-pub enum DiskContent {
+pub enum Content {
     Table(Table),
+    Filesystem(crate::partition::Filesystem),
+    Zfs(crate::zfs::ZfsPartition),
 }
 
 #[derive(Serialize, Deserialize, Debug)]

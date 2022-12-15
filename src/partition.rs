@@ -18,7 +18,7 @@ pub struct Partition {
     pub flags: Vec<String>,
     #[serde(default)]
     pub bootable: bool,
-    pub content: PartitionContent
+    pub content: crate::disk::Content,
 }
 
 #[derive(Serialize, Deserialize, AsRefStr, Debug, Default)]
@@ -53,19 +53,24 @@ pub enum FilesystemType {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = "type")]
-#[serde(rename_all = "lowercase")]
-pub enum PartitionContent {
-    Filesystem(FilesystemPartition),
-    Zfs(crate::zfs::ZfsPartition),
-}
-
-#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct FilesystemPartition {
+pub struct Filesystem {
     pub format: String,
     pub mountpoint: String,
     pub options: Option<Vec<String>>,
     pub mount_options: Option<Vec<String>>,
     pub extra_args: Option<String>,
+}
+
+impl Filesystem {
+    pub fn create(&self, device: &str) -> Vec<String> {
+        vec![
+            format!(
+                "mkfs.{} {} {}",
+                &self.format,
+                &self.extra_args.as_ref().map_or_else(|| "", |v| v.as_ref()),
+                device
+            )
+        ]
+    }
 }

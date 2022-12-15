@@ -6,6 +6,19 @@ pub struct ZfsPartition {
     pub pool: String,
 }
 
+impl ZfsPartition {
+    pub fn create(&self, device: &str) -> Vec<String> {
+        vec![
+            format!(
+                "ZFSDEVICES_{}=\"${{ZFSDEVICES_{}:-}}{} \"",
+                &self.pool,
+                &self.pool,
+                device
+            )
+        ]
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Zpool {
@@ -45,7 +58,6 @@ impl Zpool {
         commands
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "zfs_type")]

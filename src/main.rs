@@ -34,7 +34,7 @@ fn main() -> Result<()> {
 
     for (_disk_name, disk_config) in &config.disk {
         match &disk_config.content {
-            disk::DiskContent::Table(table) => {
+            disk::Content::Table(table) => {
                 create_script.push_str(&format!(
                     "parted -s {} -- mklabel {}\n",
                     disk_config.device,
@@ -87,25 +87,23 @@ fn main() -> Result<()> {
                     create_script.push_str("udevadm trigger --subsystem-match=block; udevadm settle\n");
 
                     let device = format!("{}{}", disk_config.device, index);  // TODO port deviceNumbering
-                    match &partition.content {
-                        partition::PartitionContent::Filesystem(filesystem) =>
-                            create_script.push_str(&format!(
-                                "mkfs.{} {} {}",
-                                filesystem.format,
-                                filesystem.extra_args.as_ref().map_or_else(|| "", |v| v.as_ref()),
-                                device
-                            )),
-                        partition::PartitionContent::Zfs(zfs) =>
-                            create_script.push_str(&format!(
-                                "ZFSDEVICES_{}=\"${{ZFSDEVICES_{}:-}}{} \"",
-                                zfs.pool,
-                                zfs.pool,
-                                device
-                            )),
-                    }
+                    let create_content_cmds = match &partition.content {
+                        disk::Content::Filesystem(filesystem) => filesystem.create(&device),
+                        disk::Content::Zfs(zfs) => zfs.create(&device),
+                        disk::Content::Table(_) => {
+                            panic!("nested partition tables aren't allowed");
+                        }
+                    };
+                    create_script.push_str(&create_content_cmds.join("\n"));
                     create_script.push_str("\n\n");
                 }
-            }
+            },
+            disk::Content::Zfs(zfs) => {
+                zfs.create(&disk_config.device);
+            },
+            disk::Content::Filesystem(filesystem) => {
+                filesystem.create(&disk_config.device);
+            },
         }
     }
 
