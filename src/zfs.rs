@@ -52,3 +52,7 @@ pub struct ZfsVolume {
     #[serde(default)]
     pub mount_options: Vec<String>,
 }
+
+pub fn make_zfs_options(options: &HashMap<String, String>, flag: &str) -> String {
+    options.iter().map(|(n, v)| format!("{} {}={}", flag, n, v)).collect::<Vec<String>>().join(" ")
+}
