@@ -12,7 +12,7 @@ mod nodev;
 #[derive(Serialize, Deserialize, Debug)]
 struct Devices {
     disk: HashMap<String, disk::Disk>,
-    madm: Option<HashMap<String, mdadm::Mdadm>>,
+    mdadm: Option<HashMap<String, mdadm::Mdadm>>,
     zpool: Option<HashMap<String, zfs::Zpool>>,
     lvm_vg: Option<HashMap<String, lvm::LvmVg>>,
     nodev: Option<HashMap<String, nodev::Nodev>>,
