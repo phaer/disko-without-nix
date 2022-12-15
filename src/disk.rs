@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use strum::AsRefStr;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Disk {
@@ -21,8 +22,9 @@ pub struct Table {
     pub partitions: Vec<crate::partition::Partition>
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, AsRefStr, Debug)]
 #[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
 pub enum TableFormat {
     Gpt,
     Msdos

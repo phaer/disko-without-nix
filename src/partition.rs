@@ -1,13 +1,17 @@
 use serde::{Deserialize, Serialize};
+use strum::AsRefStr;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Partition {
     #[serde(rename="type")]
     pub type_: String,
     #[serde(default)]
+    #[serde(rename="part-type")]
     pub part_type: PartitionType,
+    #[serde(rename="fs-type")]
     pub fs_type: Option<FilesystemType>,
-    pub name: Option<String>,
+    #[serde(default)]
+    pub name: String,
     pub start: String,
     pub end: String,
     #[serde(default)]
@@ -17,8 +21,9 @@ pub struct Partition {
     pub content: PartitionContent
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, AsRefStr, Debug, Default)]
 #[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
 pub enum PartitionType {
     #[default]
     Primary,
@@ -26,8 +31,9 @@ pub enum PartitionType {
     Extended,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, AsRefStr, Debug)]
 #[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
 pub enum FilesystemType {
     Btrfs,
     Ext2,
