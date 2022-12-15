@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::convert::AsRef;
 use serde::{Deserialize, Serialize};
 use anyhow::Result;
 
@@ -27,7 +28,88 @@ fn main() -> Result<()> {
     let config_file = std::fs::read_to_string(filename)?;
     let config: Devices = serde_json::from_str(&config_file)?;
 
-    println!("{:#?}", config);
+    //println!("{:#?}", config);
+
+    let mut create_script = String::new();
+
+    for (_disk_name, disk_config) in &config.disk {
+        match &disk_config.content {
+            disk::DiskContent::Table(table) => {
+                create_script.push_str(&format!(
+                    "parted -s {} -- mklabel {}\n",
+                    disk_config.device,
+                    table.format.as_ref(),
+                ));
+
+                let mut index = 0;
+                for partition in &table.partitions {
+                    index += 1;
+                    let fs_type = partition.fs_type.as_ref().map_or_else(|| "", |v| v.as_ref());
+                    let mut args = Vec::new();
+                    match table.format {
+                        disk::TableFormat::Gpt => args.push(partition.name.as_str()),
+                        disk::TableFormat::Msdos => {
+                            args.push(partition.part_type.as_ref());
+                            args.push(fs_type);
+                        }
+                    }
+                    args.append(&mut vec![
+                        fs_type, &partition.start, &partition.end
+                    ]);
+
+                    create_script.push_str(&format!(
+                        "parted -s {} -- mkpart {} \n",
+                        disk_config.device,
+                        args.join(" ")
+                    ));
+
+                    create_script.push_str("# ensure /dev/disk/by-path/..-partN exists before continuing\n");
+                    create_script.push_str("udevadm trigger --subsystem-match=block; udevadm settle\n");
+
+                    if partition.bootable {
+                        create_script.push_str(&format!(
+                            "parted -s {} -- set {} boot on\n",
+                            disk_config.device,
+                            index
+                        ));
+                    }
+
+                    for flag in &partition.flags {
+                        create_script.push_str(&format!(
+                            "parted -s {} -- set {} {} on\n",
+                            disk_config.device,
+                            index,
+                            flag
+                        ));
+                    }
+
+                    create_script.push_str("# ensure further operations can detect new partitions\n");
+                    create_script.push_str("udevadm trigger --subsystem-match=block; udevadm settle\n");
+
+                    let device = format!("{}{}", disk_config.device, index);  // TODO port deviceNumbering
+                    match &partition.content {
+                        partition::PartitionContent::Filesystem(filesystem) =>
+                            create_script.push_str(&format!(
+                                "mkfs.{} {} {}",
+                                filesystem.format,
+                                filesystem.extra_args.as_ref().map_or_else(|| "", |v| v.as_ref()),
+                                device
+                            )),
+                        partition::PartitionContent::Zfs(zfs) =>
+                            create_script.push_str(&format!(
+                                "ZFSDEVICES_{}=\"${{ZFSDEVICES_{}:-}}{} \"",
+                                zfs.pool,
+                                zfs.pool,
+                                device
+                            )),
+                    }
+                    create_script.push_str("\n\n");
+                }
+            }
+        }
+    }
+
+    println!("{}", create_script);
 
     Ok(())
 }
