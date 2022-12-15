@@ -1,0 +1,50 @@
+{
+  "disk": {
+    "disk0": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "bootable": true,
+            "content": {
+              "format": "ext4",
+              "mountpoint": "/a",
+              "type": "filesystem"
+            },
+            "end": "100%",
+            "name": "nix",
+            "part-type": "primary",
+            "start": "0%",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdx",
+      "type": "disk"
+    },
+    "disk1": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "bootable": true,
+            "content": {
+              "format": "ext4",
+              "mountpoint": "/b",
+              "type": "filesystem"
+            },
+            "end": "100%",
+            "name": "root",
+            "part-type": "primary",
+            "start": "0%",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdy",
+      "type": "disk"
+    }
+  }
+}

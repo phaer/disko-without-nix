@@ -1,0 +1,99 @@
+{
+  "disk": {
+    "x": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "bootable": true,
+            "content": {
+              "format": "vfat",
+              "mountpoint": "/boot",
+              "type": "filesystem"
+            },
+            "end": "64MiB",
+            "fs-type": "fat32",
+            "name": "ESP",
+            "start": "0",
+            "type": "partition"
+          },
+          {
+            "content": {
+              "pool": "zroot",
+              "type": "zfs"
+            },
+            "end": "100%",
+            "name": "zfs",
+            "start": "128MiB",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdx",
+      "type": "disk"
+    },
+    "y": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "content": {
+              "pool": "zroot",
+              "type": "zfs"
+            },
+            "end": "100%",
+            "name": "zfs",
+            "start": "128MiB",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdy",
+      "type": "disk"
+    }
+  },
+  "zpool": {
+    "zroot": {
+      "datasets": {
+        "zfs_fs": {
+          "mountpoint": "/zfs_fs",
+          "options": {
+            "com.sun:auto-snapshot": "true"
+          },
+          "zfs_type": "filesystem"
+        },
+        "zfs_legacy_fs": {
+          "mountpoint": "/zfs_legacy_fs",
+          "options": {
+            "mountpoint": "legacy"
+          },
+          "zfs_type": "filesystem"
+        },
+        "zfs_testvolume": {
+          "content": {
+            "format": "ext4",
+            "mountpoint": "/ext4onzfs",
+            "type": "filesystem"
+          },
+          "size": "10M",
+          "zfs_type": "volume"
+        },
+        "zfs_unmounted_fs": {
+          "options": {
+            "mountpoint": "none"
+          },
+          "zfs_type": "filesystem"
+        }
+      },
+      "mode": "mirror",
+      "mountpoint": "/",
+      "rootFsOptions": {
+        "com.sun:auto-snapshot": "false",
+        "compression": "lz4"
+      },
+      "type": "zpool"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "disk": {
+    "vdb": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "bootable": true,
+            "content": {
+              "format": "vfat",
+              "mountpoint": "/boot",
+              "type": "filesystem"
+            },
+            "end": "100MiB",
+            "name": "ESP",
+            "start": "1MiB",
+            "type": "partition"
+          },
+          {
+            "bootable": true,
+            "content": {
+              "format": "ext4",
+              "mountpoint": "/",
+              "type": "filesystem"
+            },
+            "end": "100%",
+            "name": "root",
+            "part-type": "primary",
+            "start": "100MiB",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdx",
+      "type": "disk"
+    }
+  }
+}

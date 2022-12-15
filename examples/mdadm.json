@@ -1,0 +1,87 @@
+{
+  "disk": {
+    "vdb": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "end": "1M",
+            "flags": [
+              "bios_grub"
+            ],
+            "name": "boot",
+            "part-type": "primary",
+            "start": "0",
+            "type": "partition"
+          },
+          {
+            "content": {
+              "name": "raid1",
+              "type": "mdraid"
+            },
+            "end": "100%",
+            "name": "mdadm",
+            "start": "1MiB",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdx",
+      "type": "disk"
+    },
+    "vdc": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "end": "1M",
+            "flags": [
+              "bios_grub"
+            ],
+            "name": "boot",
+            "part-type": "primary",
+            "start": "0",
+            "type": "partition"
+          },
+          {
+            "content": {
+              "name": "raid1",
+              "type": "mdraid"
+            },
+            "end": "100%",
+            "name": "mdadm",
+            "start": "1MiB",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdy",
+      "type": "disk"
+    }
+  },
+  "mdadm": {
+    "raid1": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "content": {
+              "format": "ext4",
+              "mountpoint": "/",
+              "type": "filesystem"
+            },
+            "end": "100%",
+            "name": "primary",
+            "start": "1MiB",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "level": 1,
+      "type": "mdadm"
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "disk": {
+    "vdb": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "bootable": true,
+            "content": {
+              "format": "vfat",
+              "mountpoint": "/boot",
+              "options": [
+                "defaults"
+              ],
+              "type": "filesystem"
+            },
+            "end": "100MiB",
+            "name": "ESP",
+            "start": "1MiB",
+            "type": "partition"
+          },
+          {
+            "bootable": true,
+            "content": {
+              "format": "ext4",
+              "mountpoint": "/",
+              "type": "filesystem"
+            },
+            "end": "100%",
+            "name": "primary",
+            "start": "100MiB",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdx",
+      "type": "disk"
+    },
+    "vdc": {
+      "content": {
+        "pool": "zroot",
+        "type": "zfs"
+      },
+      "device": "/dev/sdy",
+      "type": "disk"
+    }
+  },
+  "zpool": {
+    "zroot": {
+      "datasets": {
+        "root": {
+          "options": {
+            "mountpoint": "none"
+          },
+          "zfs_type": "filesystem"
+        },
+        "root/zfs_fs": {
+          "mountpoint": "/zfs_fs",
+          "options": {
+            "com.sun:auto-snapshot": "true",
+            "mountpoint": "/zfs_fs"
+          },
+          "zfs_type": "filesystem"
+        }
+      },
+      "rootFsOptions": {
+        "mountpoint": "none"
+      },
+      "type": "zpool"
+    }
+  }
+}

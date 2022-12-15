@@ -1,0 +1,110 @@
+{
+  "disk": {
+    "one": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "bootable": true,
+            "content": {
+              "name": "boot",
+              "type": "mdraid"
+            },
+            "end": "100M",
+            "fs-type": "fat32",
+            "name": "boot",
+            "start": "0",
+            "type": "partition"
+          },
+          {
+            "content": {
+              "type": "lvm_pv",
+              "vg": "pool"
+            },
+            "end": "100%",
+            "name": "primary",
+            "start": "100M",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdx",
+      "type": "disk"
+    },
+    "two": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "bootable": true,
+            "content": {
+              "name": "boot",
+              "type": "mdraid"
+            },
+            "end": "100M",
+            "fs-type": "fat32",
+            "name": "boot",
+            "start": "0",
+            "type": "partition"
+          },
+          {
+            "content": {
+              "type": "lvm_pv",
+              "vg": "pool"
+            },
+            "end": "100%",
+            "name": "primary",
+            "start": "100M",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdy",
+      "type": "disk"
+    }
+  },
+  "lvm_vg": {
+    "pool": {
+      "lvs": {
+        "home": {
+          "content": {
+            "format": "ext4",
+            "mountpoint": "/home",
+            "type": "filesystem"
+          },
+          "lvm_type": "raid0",
+          "size": "10M",
+          "type": "lvm_lv"
+        },
+        "root": {
+          "content": {
+            "format": "ext4",
+            "mountpoint": "/",
+            "options": [
+              "defaults"
+            ],
+            "type": "filesystem"
+          },
+          "lvm_type": "mirror",
+          "size": "100M",
+          "type": "lvm_lv"
+        }
+      },
+      "type": "lvm_vg"
+    }
+  },
+  "mdadm": {
+    "boot": {
+      "content": {
+        "format": "vfat",
+        "mountpoint": "/boot",
+        "type": "filesystem"
+      },
+      "level": 1,
+      "metadata": "1.0",
+      "type": "mdadm"
+    }
+  }
+}

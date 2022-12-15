@@ -1,0 +1,41 @@
+{
+  "disk": {
+    "vdb": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "bootable": true,
+            "content": {
+              "format": "vfat",
+              "mountpoint": "/boot",
+              "type": "filesystem"
+            },
+            "end": "128MiB",
+            "fs-type": "fat32",
+            "name": "ESP",
+            "start": "1MiB",
+            "type": "partition"
+          },
+          {
+            "content": {
+              "mountpoint": "/",
+              "subvolumes": [
+                "/home",
+                "/test"
+              ],
+              "type": "btrfs"
+            },
+            "end": "100%",
+            "name": "root",
+            "start": "128MiB",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdx",
+      "type": "disk"
+    }
+  }
+}

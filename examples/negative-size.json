@@ -1,0 +1,27 @@
+{
+  "disk": {
+    "disk0": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "bootable": true,
+            "content": {
+              "format": "ext4",
+              "mountpoint": "/",
+              "type": "filesystem"
+            },
+            "end": "-10MiB",
+            "name": "nix",
+            "part-type": "primary",
+            "start": "0%",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdx",
+      "type": "disk"
+    }
+  }
+}

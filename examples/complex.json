@@ -1,0 +1,198 @@
+{
+  "disk": {
+    "disk0": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "bootable": true,
+            "content": {
+              "format": "vfat",
+              "mountpoint": "/boot",
+              "type": "filesystem"
+            },
+            "end": "128MiB",
+            "fs-type": "fat32",
+            "name": "ESP",
+            "start": "1MiB",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdx",
+      "type": "disk"
+    },
+    "disk1": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "content": {
+              "content": {
+                "type": "lvm_pv",
+                "vg": "pool"
+              },
+              "keyFile": "/tmp/secret.key",
+              "name": "crypted1",
+              "type": "luks"
+            },
+            "end": "100%",
+            "name": "luks",
+            "start": "1M",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdy",
+      "type": "disk"
+    },
+    "disk2": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "content": {
+              "content": {
+                "type": "lvm_pv",
+                "vg": "pool"
+              },
+              "keyFile": "/tmp/secret.key",
+              "name": "crypted2",
+              "type": "luks"
+            },
+            "end": "100%",
+            "name": "luks",
+            "start": "1M",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdz",
+      "type": "disk"
+    }
+  },
+  "lvm_vg": {
+    "pool": {
+      "lvs": {
+        "raid1": {
+          "content": {
+            "name": "raid1",
+            "type": "mdraid"
+          },
+          "lvm_type": "raid0",
+          "size": "30M",
+          "type": "lvm_lv"
+        },
+        "raid2": {
+          "content": {
+            "name": "raid1",
+            "type": "mdraid"
+          },
+          "lvm_type": "raid0",
+          "size": "30M",
+          "type": "lvm_lv"
+        },
+        "root": {
+          "content": {
+            "format": "ext4",
+            "mountpoint": "/ext4_on_lvm",
+            "options": [
+              "defaults"
+            ],
+            "type": "filesystem"
+          },
+          "lvm_type": "mirror",
+          "size": "10M",
+          "type": "lvm_lv"
+        },
+        "zfs1": {
+          "content": {
+            "pool": "zroot",
+            "type": "zfs"
+          },
+          "lvm_type": "raid0",
+          "size": "128M",
+          "type": "lvm_lv"
+        },
+        "zfs2": {
+          "content": {
+            "pool": "zroot",
+            "type": "zfs"
+          },
+          "lvm_type": "raid0",
+          "size": "128M",
+          "type": "lvm_lv"
+        }
+      },
+      "type": "lvm_vg"
+    }
+  },
+  "mdadm": {
+    "raid1": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "content": {
+              "format": "ext4",
+              "mountpoint": "/ext4_mdadm_lvm",
+              "type": "filesystem"
+            },
+            "end": "100%",
+            "name": "bla",
+            "start": "1MiB",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "level": 1,
+      "type": "mdadm"
+    }
+  },
+  "zpool": {
+    "zroot": {
+      "datasets": {
+        "zfs_fs": {
+          "mountpoint": "/zfs_fs",
+          "options": {
+            "com.sun:auto-snapshot": "true"
+          },
+          "zfs_type": "filesystem"
+        },
+        "zfs_legacy_fs": {
+          "mountpoint": "/zfs_legacy_fs",
+          "options": {
+            "mountpoint": "legacy"
+          },
+          "zfs_type": "filesystem"
+        },
+        "zfs_testvolume": {
+          "content": {
+            "format": "ext4",
+            "mountpoint": "/ext4onzfs",
+            "type": "filesystem"
+          },
+          "size": "10M",
+          "zfs_type": "volume"
+        },
+        "zfs_unmounted_fs": {
+          "options": {
+            "mountpoint": "none"
+          },
+          "zfs_type": "filesystem"
+        }
+      },
+      "mode": "mirror",
+      "mountpoint": "/",
+      "rootFsOptions": {
+        "com.sun:auto-snapshot": "false",
+        "compression": "lz4"
+      },
+      "type": "zpool"
+    }
+  }
+}

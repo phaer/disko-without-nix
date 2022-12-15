@@ -1,0 +1,76 @@
+{
+  "disk": {
+    "vdb": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "bootable": true,
+            "content": {
+              "format": "vfat",
+              "mountpoint": "/boot",
+              "options": [
+                "defaults"
+              ],
+              "type": "filesystem"
+            },
+            "end": "100MiB",
+            "name": "ESP",
+            "start": "1MiB",
+            "type": "partition"
+          },
+          {
+            "content": {
+              "content": {
+                "type": "lvm_pv",
+                "vg": "pool"
+              },
+              "keyFile": "/tmp/secret.key",
+              "name": "crypted",
+              "type": "luks"
+            },
+            "end": "100%",
+            "name": "luks",
+            "start": "100MiB",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdx",
+      "type": "disk"
+    }
+  },
+  "lvm_vg": {
+    "pool": {
+      "lvs": {
+        "home": {
+          "content": {
+            "format": "ext4",
+            "mountpoint": "/home",
+            "type": "filesystem"
+          },
+          "size": "10M",
+          "type": "lvm_lv"
+        },
+        "raw": {
+          "size": "10M",
+          "type": "lvm_lv"
+        },
+        "root": {
+          "content": {
+            "format": "ext4",
+            "mountpoint": "/",
+            "options": [
+              "defaults"
+            ],
+            "type": "filesystem"
+          },
+          "size": "100M",
+          "type": "lvm_lv"
+        }
+      },
+      "type": "lvm_vg"
+    }
+  }
+}
