@@ -30,13 +30,13 @@ fn main() -> Result<()> {
 
     //println!("{:#?}", config);
 
-    let mut create_script = String::new();
+    let mut create_cmds: Vec<String>  = Vec::new();
 
     for (_disk_name, disk_config) in &config.disk {
         match &disk_config.content {
             disk::Content::Table(table) => {
-                create_script.push_str(&format!(
-                    "parted -s {} -- mklabel {}\n",
+                create_cmds.push(format!(
+                    "parted -s {} -- mklabel {}",
                     disk_config.device,
                     table.format.as_ref(),
                 ));
@@ -57,34 +57,34 @@ fn main() -> Result<()> {
                         fs_type, &partition.start, &partition.end
                     ]);
 
-                    create_script.push_str(&format!(
-                        "parted -s {} -- mkpart {} \n",
+                    create_cmds.push(format!(
+                        "parted -s {} -- mkpart {} ",
                         disk_config.device,
                         args.join(" ")
                     ));
 
-                    create_script.push_str("# ensure /dev/disk/by-path/..-partN exists before continuing\n");
-                    create_script.push_str("udevadm trigger --subsystem-match=block; udevadm settle\n");
+                    create_cmds.push("# ensure /dev/disk/by-path/..-partN exists before continuing".to_string());
+                    create_cmds.push("udevadm trigger --subsystem-match=block; udevadm settle".to_string());
 
                     if partition.bootable {
-                        create_script.push_str(&format!(
-                            "parted -s {} -- set {} boot on\n",
+                        create_cmds.push(format!(
+                            "parted -s {} -- set {} boot on",
                             disk_config.device,
                             index
                         ));
                     }
 
                     for flag in &partition.flags {
-                        create_script.push_str(&format!(
-                            "parted -s {} -- set {} {} on\n",
+                        create_cmds.push(format!(
+                            "parted -s {} -- set {} {} on",
                             disk_config.device,
                             index,
                             flag
                         ));
                     }
 
-                    create_script.push_str("# ensure further operations can detect new partitions\n");
-                    create_script.push_str("udevadm trigger --subsystem-match=block; udevadm settle\n");
+                    create_cmds.push("# ensure further operations can detect new partitions".to_string());
+                    create_cmds.push("udevadm trigger --subsystem-match=block; udevadm settle".to_string());
 
                     let device = format!("{}{}", disk_config.device, index);  // TODO port deviceNumbering
                     let create_content_cmds = match &partition.content {
@@ -94,8 +94,8 @@ fn main() -> Result<()> {
                             panic!("nested partition tables aren't allowed");
                         }
                     };
-                    create_script.push_str(&create_content_cmds.join("\n"));
-                    create_script.push_str("\n\n");
+                    create_cmds.push(create_content_cmds.join("\n"));
+                    create_cmds.push("\n".to_string());
                 }
             },
             disk::Content::Zfs(zfs) => {
@@ -109,11 +109,11 @@ fn main() -> Result<()> {
 
     if let Some(zpools) = config.zpool {
         for (zpool_name, zpool_config) in zpools {
-            create_script.push_str(&zpool_config.create(&zpool_name).join("\n"));
+            create_cmds.push(zpool_config.create(&zpool_name).join("\n"));
         }
     }
 
-    println!("{}", create_script);
+    println!("{}", create_cmds.join("\n"));
 
     Ok(())
 }
