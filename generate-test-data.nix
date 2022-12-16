@@ -15,8 +15,12 @@ let
       disks = [ "/dev/sdx" "/dev/sdy" "/dev/sdz" ];
       inherit lib;
     };
-  makeScript = config:
-    disko.lib.createScriptNoDeps config pkgs;
+  makeScript = name: config:
+    pkgs.runCommandLocal "${name}-sh" {} ''
+        cat "${disko.lib.createScriptNoDeps config pkgs}" \
+        | ${pkgs.shfmt}/bin/shfmt -i 4 -s \
+        > $out
+    '';
 in
 pkgs.linkFarm "disko-examples"
   (lib.flatten (
@@ -26,7 +30,7 @@ pkgs.linkFarm "disko-examples"
     in [
       {
         name = "${lib.removeSuffix ".nix" name}.sh";
-        path = makeScript config;
+        path = makeScript name config;
       }
       {
         name = "${lib.removeSuffix ".nix" name}.json";
