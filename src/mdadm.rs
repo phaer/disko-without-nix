@@ -1,6 +1,4 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Mdadm {
-
-}
+pub struct Mdadm {}

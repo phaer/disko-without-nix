@@ -3,12 +3,12 @@ use strum::AsRefStr;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Partition {
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     pub type_: String,
     #[serde(default)]
-    #[serde(rename="part-type")]
+    #[serde(rename = "part-type")]
     pub part_type: PartitionType,
-    #[serde(rename="fs-type")]
+    #[serde(rename = "fs-type")]
     pub fs_type: Option<FilesystemType>,
     #[serde(default)]
     pub name: String,
@@ -42,14 +42,14 @@ pub enum FilesystemType {
     Fat16,
     Fat32,
     Hfs,
-    #[serde(rename="hfs+")]
+    #[serde(rename = "hfs+")]
     HfsPlus,
-    #[serde(rename="linux-swap")]
+    #[serde(rename = "linux-swap")]
     LinuxSwap,
     Ntfs,
     Reiserfs,
     Udf,
-    Xfs
+    Xfs,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -61,4 +61,3 @@ pub struct Filesystem {
     pub mount_options: Option<Vec<String>>,
     pub extra_args: Option<String>,
 }
-

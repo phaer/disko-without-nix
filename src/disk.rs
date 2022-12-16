@@ -8,7 +8,7 @@ use crate::device::DevicePath;
 #[strum(serialize_all = "lowercase")]
 pub enum TableFormat {
     Gpt,
-    Msdos
+    Msdos,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -23,13 +23,13 @@ pub enum Content {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Disk {
     pub device: DevicePath,
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     pub type_: String,
-    pub content: Content
+    pub content: Content,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Table {
     pub format: TableFormat,
-    pub partitions: Vec<crate::partition::Partition>
+    pub partitions: Vec<crate::partition::Partition>,
 }

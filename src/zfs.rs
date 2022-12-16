@@ -9,7 +9,7 @@ pub struct ZfsPartition {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Zpool {
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     pub type_: String,
     #[serde(default)]
     pub mode: String,
@@ -20,7 +20,7 @@ pub struct Zpool {
     pub mountpoint: Option<String>,
     #[serde(default)]
     pub mount_options: Vec<String>,
-    pub datasets: HashMap<String, ZfsDataset>
+    pub datasets: HashMap<String, ZfsDataset>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -53,6 +53,9 @@ pub struct ZfsVolume {
 }
 
 pub fn make_zfs_options(options: &HashMap<String, String>, flag: &str) -> String {
-    options.iter().map(|(n, v)| format!("{} {}={}", flag, n, v)).collect::<Vec<String>>().join(" ")
+    options
+        .iter()
+        .map(|(n, v)| format!("{} {}={}", flag, n, v))
+        .collect::<Vec<String>>()
+        .join(" ")
 }
-

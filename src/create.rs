@@ -1,9 +1,8 @@
-use crate::disk::{Disk, Content, Table, TableFormat};
-use crate::zfs::{Zpool, ZfsDataset, ZfsPartition, ZfsVolume, ZfsFilesystem, make_zfs_options};
+use crate::device::DevicePath;
+use crate::disk::{Content, Disk, Table, TableFormat};
 use crate::partition::Filesystem;
 use crate::partition::Partition;
-use crate::device::DevicePath;
-
+use crate::zfs::{make_zfs_options, ZfsDataset, ZfsFilesystem, ZfsPartition, ZfsVolume, Zpool};
 
 impl Disk {
     pub fn create(&self) -> Vec<String> {
@@ -34,7 +33,12 @@ impl Table {
 }
 
 impl Partition {
-    pub fn create(&self, device_path: &DevicePath, table_format: &TableFormat, index: u8) -> Vec<String> {
+    pub fn create(
+        &self,
+        device_path: &DevicePath,
+        table_format: &TableFormat,
+        index: u8,
+    ) -> Vec<String> {
         let mut commands: Vec<String> = Vec::new();
 
         let fs_type = self.fs_type.as_ref().map_or_else(|| "", |v| v.as_ref());
@@ -46,9 +50,7 @@ impl Partition {
                 args.push(fs_type);
             }
         }
-        args.append(&mut vec![
-            fs_type, &self.start, &self.end
-        ]);
+        args.append(&mut vec![fs_type, &self.start, &self.end]);
 
         commands.push(format!(
             "parted -s {} -- mkpart {} ",
@@ -62,17 +64,14 @@ impl Partition {
         if self.bootable {
             commands.push(format!(
                 "parted -s {} -- set {} boot on",
-                device_path,
-                index
+                device_path, index
             ));
         }
 
         for flag in &self.flags {
             commands.push(format!(
                 "parted -s {} -- set {} {} on",
-                device_path,
-                index,
-                flag
+                device_path, index, flag
             ));
         }
 
@@ -87,47 +86,33 @@ impl Partition {
     }
 }
 
-
-
 impl Content {
     pub fn create(&self, device_path: &DevicePath) -> Vec<String> {
         match self {
-            Content::Table(table) => {
-                table.create(device_path)
-            },
-            Content::Zfs(zfs) => {
-                zfs.create(device_path)
-            },
-            Content::Filesystem(filesystem) => {
-                filesystem.create(device_path)
-            },
+            Content::Table(table) => table.create(device_path),
+            Content::Zfs(zfs) => zfs.create(device_path),
+            Content::Filesystem(filesystem) => filesystem.create(device_path),
         }
     }
 }
 
 impl Filesystem {
     pub fn create(&self, device: &DevicePath) -> Vec<String> {
-        vec![
-            format!(
-                "mkfs.{} {} {}",
-                &self.format,
-                &self.extra_args.as_ref().map_or_else(|| "", |v| v.as_ref()),
-                device
-            )
-        ]
+        vec![format!(
+            "mkfs.{} {} {}",
+            &self.format,
+            &self.extra_args.as_ref().map_or_else(|| "", |v| v.as_ref()),
+            device
+        )]
     }
 }
 
 impl ZfsPartition {
     pub fn create(&self, device: &DevicePath) -> Vec<String> {
-        vec![
-            format!(
-                "ZFSDEVICES_{}=\"${{ZFSDEVICES_{}:-}}{} \"",
-                &self.pool,
-                &self.pool,
-                device
-            )
-        ]
+        vec![format!(
+            "ZFSDEVICES_{}=\"${{ZFSDEVICES_{}:-}}{} \"",
+            &self.pool, &self.pool, device
+        )]
     }
 }
 
@@ -147,13 +132,12 @@ impl Zpool {
         for (dataset_name, dataset_config) in &self.datasets {
             commands.append(&mut match dataset_config {
                 ZfsDataset::Filesystem(filesystem) => filesystem.create(zpool_name, dataset_name),
-                ZfsDataset::Volume(volume) => volume.create(zpool_name, dataset_name)
+                ZfsDataset::Volume(volume) => volume.create(zpool_name, dataset_name),
             })
         }
         commands
     }
 }
-
 
 impl ZfsFilesystem {
     pub fn create(&self, zpool_name: &str, dataset_name: &str) -> Vec<String> {
@@ -176,8 +160,7 @@ impl ZfsVolume {
                 make_zfs_options(&self.options, "-o"),
                 self.size
             ),
-            String::from("udevadm trigger --subsystem-match=block; udevadm settle")
-            // TODO create volume contents
+            String::from("udevadm trigger --subsystem-match=block; udevadm settle"), // TODO create volume contents
         ]
     }
 }
