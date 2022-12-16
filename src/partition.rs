@@ -62,15 +62,3 @@ pub struct Filesystem {
     pub extra_args: Option<String>,
 }
 
-impl Filesystem {
-    pub fn create(&self, device: &str) -> Vec<String> {
-        vec![
-            format!(
-                "mkfs.{} {} {}",
-                &self.format,
-                &self.extra_args.as_ref().map_or_else(|| "", |v| v.as_ref()),
-                device
-            )
-        ]
-    }
-}
