@@ -1,18 +1,18 @@
 use crate::{disk::Disk, lvm::LvmVg, mdadm::Mdadm, nodev::Nodev, zfs::Zpool};
 use anyhow::anyhow;
+use indexmap::IndexMap;
 use lazy_static::lazy_static;
 use regex::{Captures, Regex, RegexSet};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::fmt;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Devices {
-    pub disk: HashMap<String, Disk>,
-    pub mdadm: Option<HashMap<String, Mdadm>>,
-    pub zpool: Option<HashMap<String, Zpool>>,
-    pub lvm_vg: Option<HashMap<String, LvmVg>>,
-    pub nodev: Option<HashMap<String, Nodev>>,
+    pub disk: IndexMap<String, Disk>,
+    pub mdadm: Option<IndexMap<String, Mdadm>>,
+    pub zpool: Option<IndexMap<String, Zpool>>,
+    pub lvm_vg: Option<IndexMap<String, LvmVg>>,
+    pub nodev: Option<IndexMap<String, Nodev>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]

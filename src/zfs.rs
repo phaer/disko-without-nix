@@ -1,5 +1,5 @@
+use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ZfsPartition {
@@ -14,13 +14,13 @@ pub struct Zpool {
     #[serde(default)]
     pub mode: String,
     #[serde(default)]
-    pub options: HashMap<String, String>,
+    pub options: IndexMap<String, String>,
     #[serde(default)]
-    pub root_fs_options: HashMap<String, String>,
+    pub root_fs_options: IndexMap<String, String>,
     pub mountpoint: Option<String>,
     #[serde(default)]
     pub mount_options: Vec<String>,
-    pub datasets: HashMap<String, ZfsDataset>,
+    pub datasets: IndexMap<String, ZfsDataset>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -36,7 +36,7 @@ pub enum ZfsDataset {
 pub struct ZfsFilesystem {
     pub mountpoint: Option<String>,
     #[serde(default)]
-    pub options: HashMap<String, String>,
+    pub options: IndexMap<String, String>,
     #[serde(default)]
     pub mount_options: Vec<String>,
 }
@@ -45,14 +45,14 @@ pub struct ZfsFilesystem {
 #[serde(rename_all = "camelCase")]
 pub struct ZfsVolume {
     pub size: String,
-    pub content: HashMap<String, String>,
+    pub content: IndexMap<String, String>,
     #[serde(default)]
-    pub options: HashMap<String, String>,
+    pub options: IndexMap<String, String>,
     #[serde(default)]
     pub mount_options: Vec<String>,
 }
 
-pub fn make_zfs_options(options: &HashMap<String, String>, flag: &str) -> String {
+pub fn make_zfs_options(options: &IndexMap<String, String>, flag: &str) -> String {
     options
         .iter()
         .map(|(n, v)| format!("{} {}={}", flag, n, v))

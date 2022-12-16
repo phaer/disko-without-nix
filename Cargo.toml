@@ -12,3 +12,13 @@ serde_json = "1.0"
 anyhow = "1.0.66"
 regex = "1.7.0"
 lazy_static = "1.4.0"
+indexmap = { version = "1.9.2", features = ["serde"] }
+
+[dev-dependencies]
+insta = { version = "1.23.0", features = ["yaml"] }
+
+[profile.dev.package.insta]
+opt-level = 3
+
+[profile.dev.package.similar]
+opt-level = 3

@@ -1,8 +1,9 @@
-use crate::device::{Devices, DevicePath};
+use crate::device::{DevicePath, Devices};
 use crate::disk::{Content, Disk, Table, TableFormat};
 use crate::partition::Filesystem;
 use crate::partition::Partition;
 use crate::zfs::{make_zfs_options, ZfsDataset, ZfsFilesystem, ZfsPartition, ZfsVolume, Zpool};
+use anyhow::Result;
 
 impl Devices {
     pub fn create(&self) -> Vec<String> {
@@ -19,9 +20,7 @@ impl Devices {
         }
         commands
     }
-
 }
-
 
 impl Disk {
     pub fn create(&self) -> Vec<String> {
@@ -182,4 +181,15 @@ impl ZfsVolume {
             String::from("udevadm trigger --subsystem-match=block; udevadm settle"), // TODO create volume contents
         ]
     }
+}
+
+#[test]
+fn test_create_example() -> Result<()> {
+    fn load_example(path: &str) -> Result<String> {
+        let config_file = std::fs::read_to_string(path)?;
+        let devices: Devices = serde_json::from_str(&config_file)?;
+        Ok(devices.create().join("\n"))
+    }
+    insta::assert_display_snapshot!(load_example("./examples/zfs.json")?);
+    Ok(())
 }
