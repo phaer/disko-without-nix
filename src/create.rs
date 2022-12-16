@@ -1,8 +1,27 @@
-use crate::device::DevicePath;
+use crate::device::{Devices, DevicePath};
 use crate::disk::{Content, Disk, Table, TableFormat};
 use crate::partition::Filesystem;
 use crate::partition::Partition;
 use crate::zfs::{make_zfs_options, ZfsDataset, ZfsFilesystem, ZfsPartition, ZfsVolume, Zpool};
+
+impl Devices {
+    pub fn create(&self) -> Vec<String> {
+        let mut commands: Vec<String> = Vec::new();
+
+        for (_disk_name, disk) in &self.disk {
+            commands.append(&mut disk.create())
+        }
+
+        if let Some(zpools) = &self.zpool {
+            for (zpool_name, zpool_config) in zpools {
+                commands.append(&mut zpool_config.create(&zpool_name));
+            }
+        }
+        commands
+    }
+
+}
+
 
 impl Disk {
     pub fn create(&self) -> Vec<String> {

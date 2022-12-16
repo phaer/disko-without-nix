@@ -15,7 +15,7 @@ pub struct Devices {
     pub nodev: Option<HashMap<String, Nodev>>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 #[serde(try_from = "&str")]
 pub struct DevicePath(pub String, pub Option<u8>);
 

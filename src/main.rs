@@ -18,19 +18,9 @@ fn main() -> Result<()> {
     let config_file = std::fs::read_to_string(filename)?;
     let devices: device::Devices = serde_json::from_str(&config_file)?;
 
-    let mut create_cmds: Vec<String> = Vec::new();
+    let create_commands = devices.create();
 
-    for (_disk_name, disk) in &devices.disk {
-        create_cmds.append(&mut disk.create())
-    }
-
-    if let Some(zpools) = devices.zpool {
-        for (zpool_name, zpool_config) in zpools {
-            create_cmds.append(&mut zpool_config.create(&zpool_name));
-        }
-    }
-
-    println!("{}", create_cmds.join("\n"));
+    println!("{}", create_commands.join("\n"));
 
     Ok(())
 }
