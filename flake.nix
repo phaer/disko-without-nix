@@ -3,9 +3,11 @@
     naersk.url = "github:nix-community/naersk/master";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
     utils.url = "github:numtide/flake-utils";
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, utils, naersk }:
+  outputs = { self, nixpkgs, utils, naersk, disko }:
     utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };

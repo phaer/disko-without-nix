@@ -1,0 +1,37 @@
+{
+  "disk": {
+    "/dev/sdx": {
+      "content": {
+        "format": "gpt",
+        "partitions": [
+          {
+            "end": "1M",
+            "flags": [
+              "bios_grub"
+            ],
+            "name": "boot",
+            "part-type": "primary",
+            "start": "0",
+            "type": "partition"
+          },
+          {
+            "bootable": true,
+            "content": {
+              "format": "ext4",
+              "mountpoint": "/",
+              "type": "filesystem"
+            },
+            "end": "100%",
+            "name": "root",
+            "part-type": "primary",
+            "start": "1M",
+            "type": "partition"
+          }
+        ],
+        "type": "table"
+      },
+      "device": "/dev/sdx",
+      "type": "disk"
+    }
+  }
+}
