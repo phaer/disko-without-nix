@@ -3,7 +3,6 @@ use crate::disk::{Content, Disk, Table, TableFormat};
 use crate::partition::Filesystem;
 use crate::partition::Partition;
 use crate::zfs::{make_zfs_options, ZfsDataset, ZfsFilesystem, ZfsPartition, ZfsVolume, Zpool};
-use anyhow::Result;
 
 impl Devices {
     pub fn create(&self) -> Vec<String> {
@@ -113,6 +112,14 @@ impl Content {
             Content::Zfs(zfs) => zfs.create(device_path),
             Content::Filesystem(filesystem) => filesystem.create(device_path),
             Content::None => Vec::new(),
+            Content::Mdraid(_)
+                | Content::Btrfs(_)
+                | Content::Swap(_)
+                | Content::Luks(_)
+                | Content::LvmPv(_) => {
+                    eprintln!("Warning: {:#?} is not implemented yet, PRs welcome!", self);
+                    Vec::new()
+                },
         }
     }
 }

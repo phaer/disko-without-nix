@@ -13,13 +13,18 @@ pub enum TableFormat {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(tag = "type")]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 pub enum Content {
     #[default]
     None,
     Table(Table),
     Filesystem(crate::partition::Filesystem),
     Zfs(crate::zfs::ZfsPartition),
+    Mdraid(crate::mdadm::Mdraid),
+    Btrfs(crate::btrfs::Btrfs),
+    Swap(crate::swap::Swap),
+    Luks(crate::luks::Luks),
+    LvmPv(crate::lvm::LvmPv),
 }
 
 #[derive(Serialize, Deserialize, Debug)]

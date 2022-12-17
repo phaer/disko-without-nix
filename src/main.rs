@@ -8,6 +8,9 @@ mod mdadm;
 mod nodev;
 mod partition;
 mod zfs;
+mod btrfs;
+mod swap;
+mod luks;
 
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
