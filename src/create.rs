@@ -9,6 +9,8 @@ impl Devices {
     pub fn create(&self) -> Vec<String> {
         let mut commands: Vec<String> = Vec::new();
 
+        commands.push("#!/usr/bin/env bash\nset -efux".to_string());
+
         for (_disk_name, disk) in &self.disk {
             commands.append(&mut disk.create())
         }
