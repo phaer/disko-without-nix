@@ -112,6 +112,7 @@ impl Content {
             Content::Table(table) => table.create(device_path),
             Content::Zfs(zfs) => zfs.create(device_path),
             Content::Filesystem(filesystem) => filesystem.create(device_path),
+            Content::None => Vec::new(),
         }
     }
 }

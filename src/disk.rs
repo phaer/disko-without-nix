@@ -11,10 +11,12 @@ pub enum TableFormat {
     Msdos,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 #[serde(tag = "type")]
 #[serde(rename_all = "lowercase")]
 pub enum Content {
+    #[default]
+    None,
     Table(Table),
     Filesystem(crate::partition::Filesystem),
     Zfs(crate::zfs::ZfsPartition),

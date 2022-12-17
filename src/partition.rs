@@ -18,6 +18,7 @@ pub struct Partition {
     pub flags: Vec<String>,
     #[serde(default)]
     pub bootable: bool,
+    #[serde(default)]
     pub content: crate::disk::Content,
 }
 
