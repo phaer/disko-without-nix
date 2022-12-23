@@ -138,16 +138,21 @@ impl Filesystem {
 
 impl ZfsPartition {
     pub fn create(&self, device: &DevicePath) -> Vec<String> {
-        vec![format!(
-            "ZFSDEVICES_{}=\"${{ZFSDEVICES_{}:-}}{} \"\n",
+        let mut commands = Vec::new();
+        commands.push(format!(
+            "ZFSDEVICES_{}=\"${{ZFSDEVICES_{}:-}}{} \"",
             &self.pool, &self.pool, device
-        )]
+        ));
+        if device.is_partition() {
+            commands.push(String::new())
+        }
+        commands
     }
 }
 
 impl Zpool {
     pub fn create(&self, zpool_name: &str) -> Vec<String> {
-        let mut commands: Vec<String> = Vec::new();
+        let mut commands = Vec::new();
         let mode = if self.mode != "" { self.mode.clone() + " \\\n    " } else { self.mode.clone() };
         commands.push(format!(
             "zpool create {zpool} \\\n    {mode}{options}{root_fs_options} \\\n    ${{ZFSDEVICES_{zpool}}}",
