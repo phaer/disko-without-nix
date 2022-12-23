@@ -83,17 +83,18 @@ impl Partition {
 
         if self.bootable {
             commands.push(format!(
-                "parted -s {} -- set {} boot on\n",
+                "parted -s {} -- set {} boot on",
                 device_path, index
             ));
         }
 
         for flag in &self.flags {
             commands.push(format!(
-                "parted -s {} -- set {} {} on\n",
+                "\nparted -s {} -- set {} {} on",
                 device_path, index, flag
             ));
         }
+        commands.push("".to_string());
 
         commands.push("# ensure further operations can detect new partitions".to_string());
         commands.push("udevadm trigger --subsystem-match=block\nudevadm settle".to_string());
@@ -138,7 +139,7 @@ impl Filesystem {
 impl ZfsPartition {
     pub fn create(&self, device: &DevicePath) -> Vec<String> {
         vec![format!(
-            "ZFSDEVICES_{}=\"${{ZFSDEVICES_{}:-}}{} \"",
+            "ZFSDEVICES_{}=\"${{ZFSDEVICES_{}:-}}{} \"\n",
             &self.pool, &self.pool, device
         )]
     }
@@ -168,12 +169,15 @@ impl Zpool {
 
 impl ZfsFilesystem {
     pub fn create(&self, zpool_name: &str, dataset_name: &str) -> Vec<String> {
-        vec![format!(
-            "zfs create {}/{} \\\n    {}",
-            zpool_name,
-            dataset_name,
-            make_zfs_options(&self.options, "-o")
-        )]
+        vec![
+            format!(
+                "zfs create {}/{} \\\n    {}",
+                zpool_name,
+                dataset_name,
+                make_zfs_options(&self.options, "-o")
+            ),
+            String::from(""),
+        ]
     }
 }
 
@@ -187,7 +191,9 @@ impl ZfsVolume {
                 make_zfs_options(&self.options, "-o"),
                 self.size
             ),
-            String::from("udevadm trigger --subsystem-match=block\nudevadm settle"), // TODO create volume contents
+            String::from("udevadm trigger --subsystem-match=block\nudevadm settle"),
+            // TODO create volume contents
+            String::from(""),
         ]
     }
 }

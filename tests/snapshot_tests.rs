@@ -5,7 +5,7 @@ use anyhow::Result;
 fn create_script(path: &Path) -> Result<String> {
     let config_file = std::fs::read_to_string(path)?;
     let devices: Devices = serde_json::from_str(&config_file)?;
-    Ok(devices.create().join("\n"))
+    Ok(devices.create().join("\n").trim().to_string())
 }
 
 #[test]
