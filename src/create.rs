@@ -117,8 +117,8 @@ impl Content {
                 | Content::Swap(_)
                 | Content::Luks(_)
                 | Content::LvmPv(_) => {
-                    eprintln!("Warning: {:#?} is not implemented yet, PRs welcome!", self);
-                    Vec::new()
+                    eprintln!("Warning: {:?} is not implemented yet, PRs welcome!", self);
+                    vec![format!("# {:?} is not implemented yet", self)]
                 },
         }
     }
