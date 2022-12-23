@@ -147,14 +147,13 @@ impl ZfsPartition {
 impl Zpool {
     pub fn create(&self, zpool_name: &str) -> Vec<String> {
         let mut commands: Vec<String> = Vec::new();
-
+        let mode = if self.mode != "" { self.mode.clone() + " \\\n    " } else { self.mode.clone() };
         commands.push(format!(
-            "zpool create {} {} {} {} ${{ZFSDEVICES_{}}}",
-            zpool_name,
-            self.mode,
-            make_zfs_options(&self.options, "-o"),
-            make_zfs_options(&self.root_fs_options, "-O"),
-            zpool_name,
+            "zpool create {zpool} \\\n    {mode}{options}{root_fs_options} \\\n    ${{ZFSDEVICES_{zpool}}}",
+            zpool=zpool_name,
+            mode=mode,
+            options=make_zfs_options(&self.options, "-o"),
+            root_fs_options=make_zfs_options(&self.root_fs_options, "-O"),
         ));
 
         for (dataset_name, dataset_config) in &self.datasets {
@@ -170,7 +169,7 @@ impl Zpool {
 impl ZfsFilesystem {
     pub fn create(&self, zpool_name: &str, dataset_name: &str) -> Vec<String> {
         vec![format!(
-            "zfs create {}/{} {}",
+            "zfs create {}/{} \\\n    {}",
             zpool_name,
             dataset_name,
             make_zfs_options(&self.options, "-o")
@@ -182,7 +181,7 @@ impl ZfsVolume {
     pub fn create(&self, zpool_name: &str, dataset_name: &str) -> Vec<String> {
         vec![
             format!(
-                "zfs create {}/{} {} -V {}",
+                "zfs create {}/{} \\\n    {}-V {}",
                 zpool_name,
                 dataset_name,
                 make_zfs_options(&self.options, "-o"),
