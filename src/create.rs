@@ -70,37 +70,37 @@ impl Partition {
             }
         }
         args.append(&mut vec![fs_type, &self.start, &self.end]);
+        args.retain(|&s| s != "");
 
         commands.push(format!(
-            "parted -s {} -- mkpart {} ",
+            "parted -s {} -- mkpart {}\n",
             device_path,
             args.join(" ")
         ));
 
         commands.push("# ensure /dev/disk/by-path/..-partN exists before continuing".to_string());
-        commands.push("udevadm trigger --subsystem-match=block; udevadm settle".to_string());
+        commands.push("udevadm trigger --subsystem-match=block\nudevadm settle".to_string());
 
         if self.bootable {
             commands.push(format!(
-                "parted -s {} -- set {} boot on",
+                "parted -s {} -- set {} boot on\n",
                 device_path, index
             ));
         }
 
         for flag in &self.flags {
             commands.push(format!(
-                "parted -s {} -- set {} {} on",
+                "parted -s {} -- set {} {} on\n",
                 device_path, index, flag
             ));
         }
 
         commands.push("# ensure further operations can detect new partitions".to_string());
-        commands.push("udevadm trigger --subsystem-match=block; udevadm settle".to_string());
+        commands.push("udevadm trigger --subsystem-match=block\nudevadm settle".to_string());
 
         let partition_path = device_path.with_partition(index);
         let create_content_cmds = &self.content.create(&partition_path);
         commands.push(create_content_cmds.join("\n"));
-        commands.push("\n".to_string());
         commands
     }
 }
@@ -127,7 +127,7 @@ impl Content {
 impl Filesystem {
     pub fn create(&self, device: &DevicePath) -> Vec<String> {
         vec![format!(
-            "mkfs.{} {} {}",
+            "mkfs.{} \\\n   {} {}\n",
             &self.format,
             &self.extra_args.as_ref().map_or_else(|| "", |v| v.as_ref()),
             device
@@ -188,7 +188,7 @@ impl ZfsVolume {
                 make_zfs_options(&self.options, "-o"),
                 self.size
             ),
-            String::from("udevadm trigger --subsystem-match=block; udevadm settle"), // TODO create volume contents
+            String::from("udevadm trigger --subsystem-match=block\nudevadm settle"), // TODO create volume contents
         ]
     }
 }
