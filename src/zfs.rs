@@ -1,5 +1,6 @@
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
+use crate::disk::Content;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ZfsPartition {
@@ -45,7 +46,8 @@ pub struct ZfsFilesystem {
 #[serde(rename_all = "camelCase")]
 pub struct ZfsVolume {
     pub size: String,
-    pub content: IndexMap<String, String>,
+    #[serde(default)]
+    pub content: Content,
     #[serde(default)]
     pub options: IndexMap<String, String>,
     #[serde(default)]

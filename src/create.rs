@@ -198,17 +198,17 @@ impl ZfsFilesystem {
 
 impl ZfsVolume {
     pub fn create(&self, zpool_name: &str, dataset_name: &str) -> Vec<String> {
-        vec![
-            format!(
+        let mut commands = Vec::new();
+        let volume_path = DevicePath::try_from(vec!["/dev/zvol", zpool_name, dataset_name].join("/").as_ref()).unwrap();
+        commands.push(format!(
                 "zfs create {}/{} \\\n    {}-V {}",
                 zpool_name,
                 dataset_name,
                 make_zfs_options(&self.options, "-o"),
                 self.size
-            ),
-            String::from("udevadm trigger --subsystem-match=block\nudevadm settle"),
-            // TODO create volume contents
-            String::from(""),
-        ]
+        ));
+        commands.push(String::from("udevadm trigger --subsystem-match=block\nudevadm settle"));
+        commands.append(&mut self.content.create(&volume_path));
+        commands
     }
 }

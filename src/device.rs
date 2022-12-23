@@ -34,10 +34,11 @@ impl TryFrom<&str> for DevicePath {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         lazy_static! {
-            static ref PATTERNS: [&'static str; 3] =
+            static ref PATTERNS: [&'static str; 4] =
                 [
                     r"(/dev/[vs]d[a-z]+)(.*)", // /dev/{s,v}da style
                     r"(/dev/disk/.+)-part(\d+)?", // /dev/disk /by-id/XXX-partY style
+                    r"(/dev/zvol/.+)", // /dev/zvol/$pool/$dataset style
                     r"(/dev/disk/.+)?", // /dev/disk /by-id/XXX style
                     // TODO fix regex and tests
                     //r"(/dev/(?:nvme|md/|mmcblk)\d+)(?:p?(\d*))?" // /dev/nvme0n1p1 style
@@ -102,6 +103,16 @@ fn test_device_path_try_from() {
             .try_into()
             .unwrap()
     );
+    assert_eq!(
+        DevicePath(
+            "/dev/zvol/zroot/zfs_testvolume".to_string(),
+            None
+        ),
+        "/dev/zvol/zroot/zfs_testvolume"
+            .try_into()
+            .unwrap()
+    );
+
     //    assert_eq!(DevicePath("/dev/mmcblk0".to_string(), None), "/dev/mmcblk0".try_into().unwrap());
     //    assert_eq!(DevicePath("/dev/mmcblk0".to_string(), Some(10)), "/dev/mmcblk0p10".try_into().unwrap());
 }
