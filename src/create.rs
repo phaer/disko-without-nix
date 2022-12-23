@@ -4,6 +4,7 @@ use crate::partition::Filesystem;
 use crate::partition::Partition;
 use crate::zfs::{make_zfs_options, ZfsDataset, ZfsFilesystem, ZfsPartition, ZfsVolume, Zpool};
 use crate::swap::Swap;
+use crate::btrfs::Btrfs;
 
 impl Devices {
     pub fn create(&self) -> Vec<String> {
@@ -114,9 +115,9 @@ impl Content {
             Content::Zfs(zfs) => zfs.create(device_path),
             Content::Filesystem(filesystem) => filesystem.create(device_path),
             Content::Swap(swap) => swap.create(device_path),
+            Content::Btrfs(btrfs) => btrfs.create(device_path),
             Content::None => Vec::new(),
             Content::Mdraid(_)
-                | Content::Btrfs(_)
                 | Content::Luks(_)
                 | Content::LvmPv(_) => {
                     eprintln!("Warning: {:?} is not implemented yet, PRs welcome!", self);
@@ -145,6 +146,23 @@ impl Swap {
         )]
     }
 }
+
+impl Btrfs {
+    pub fn create(&self, device: &DevicePath) -> Vec<String> {
+        vec![format!(
+            "mkfs.btrfs {device}
+MNTPOINT=$(mktemp -d)
+(
+    mount {device} \"$MNTPOINT\"
+    trap 'umount $MNTPOINT; rm -rf $MNTPOINT' EXIT
+    btrfs subvolume create \"$MNTPOINT\"//home
+    btrfs subvolume create \"$MNTPOINT\"//test
+)",
+            device=device
+        )]
+    }
+}
+
 
 impl ZfsPartition {
     pub fn create(&self, device: &DevicePath) -> Vec<String> {
