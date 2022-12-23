@@ -50,6 +50,7 @@ in
       cat > $snapPath <<EOF
     ---
     source: tests/snapshot_tests.rs
+    assertion_line: 35
     expression: create_script(&path)?
     ---
     $(cat ''${scriptPath})
