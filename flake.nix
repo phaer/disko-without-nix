@@ -12,11 +12,17 @@
       let
         pkgs = import nixpkgs { inherit system; };
         naersk-lib = pkgs.callPackage naersk { };
+        snapshotTests = import ./snapshot-tests.nix { inherit self; };
       in
       {
+        packages = {
+          inherit (snapshotTests) updateExamples updateSnapshots;
+        };
         defaultPackage = naersk-lib.buildPackage ./.;
         devShell = with pkgs; mkShell {
-          buildInputs = [ cargo rustc rustfmt pre-commit rustPackages.clippy rust-analyzer cargo-insta ];
+          buildInputs = [
+            cargo rustc rustfmt pre-commit rustPackages.clippy rust-analyzer cargo-insta
+          ];
           RUST_SRC_PATH = rustPlatform.rustLibSrc;
         };
       });
