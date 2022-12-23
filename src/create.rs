@@ -3,6 +3,7 @@ use crate::disk::{Content, Disk, Table, TableFormat};
 use crate::partition::Filesystem;
 use crate::partition::Partition;
 use crate::zfs::{make_zfs_options, ZfsDataset, ZfsFilesystem, ZfsPartition, ZfsVolume, Zpool};
+use crate::swap::Swap;
 
 impl Devices {
     pub fn create(&self) -> Vec<String> {
@@ -112,10 +113,10 @@ impl Content {
             Content::Table(table) => table.create(device_path),
             Content::Zfs(zfs) => zfs.create(device_path),
             Content::Filesystem(filesystem) => filesystem.create(device_path),
+            Content::Swap(swap) => swap.create(device_path),
             Content::None => Vec::new(),
             Content::Mdraid(_)
                 | Content::Btrfs(_)
-                | Content::Swap(_)
                 | Content::Luks(_)
                 | Content::LvmPv(_) => {
                     eprintln!("Warning: {:?} is not implemented yet, PRs welcome!", self);
@@ -131,6 +132,15 @@ impl Filesystem {
             "mkfs.{} \\\n   {} {}\n",
             &self.format,
             &self.extra_args.as_ref().map_or_else(|| "", |v| v.as_ref()),
+            device
+        )]
+    }
+}
+
+impl Swap {
+    pub fn create(&self, device: &DevicePath) -> Vec<String> {
+        vec![format!(
+            "mkswap {}\n",
             device
         )]
     }
