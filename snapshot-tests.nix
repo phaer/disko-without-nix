@@ -16,10 +16,10 @@ let
       disks = [ "/dev/sdx" "/dev/sdy" "/dev/sdz" ];
       inherit lib;
     };
-  makeScript = name: config:
+  makeScript = name: function: config:
     pkgs.runCommandLocal "${name}.sh" {} ''
          ${pkgs.shfmt}/bin/shfmt -i 4 \
-          < "${disko.lib.createScriptNoDeps config pkgs}" \
+          < "${disko.lib.${function} config pkgs}" \
           > $out
     '';
   diskoExamples = pkgs.linkFarm "disko-examples"
@@ -27,13 +27,18 @@ let
       builtins.map (name:
         let
           config = makeConfig name;
+          baseName = lib.removeSuffix ".nix" name;
         in [
           {
-            name = "${lib.removeSuffix ".nix" name}.sh";
-            path = makeScript name config;
+            name = "create-${baseName}.sh";
+            path = makeScript name "createScriptNoDeps" config;
           }
           {
-            name = "${lib.removeSuffix ".nix" name}.json";
+            name = "mount-${baseName}.sh";
+            path = makeScript name "mountScriptNoDeps" config;
+          }
+          {
+            name = "${baseName}.json";
             path = pkgs.runCommandLocal "${name}-json" {} ''
           echo '${builtins.toJSON config}' | ${pkgs.jq}/bin/jq . > $out
         '';
